@@ -19,7 +19,7 @@ func NewCategoryService(CategoryDB database.Category) *CategoryService {
 	}
 }
 
-func (c *CategoryService) CreateCategory(ctx context.Context, in *pb.CreateCategoryRequest) (*pb.CategoryResponse, error) {
+func (c *CategoryService) CreateCategory(ctx context.Context, in *pb.CreateCategoryRequest) (*pb.Category, error) {
 	category, err := c.CategoryDB.Create(in.Name, in.Description)
 	if err != nil {
 		return nil, err
@@ -31,7 +31,41 @@ func (c *CategoryService) CreateCategory(ctx context.Context, in *pb.CreateCateg
 		Description: category.Description,
 	}
 
-	return &pb.CategoryResponse{
-		Category: categoryResponse,
-	}, nil
+	return categoryResponse, nil
+}
+
+func (c *CategoryService) ListCategories(ctx context.Context, in *pb.Blank) (*pb.CategoryList, error) {
+	categories, err := c.CategoryDB.FindAll()
+	if err != nil {
+		return nil, err
+	}
+
+	var categoriesResponse []*pb.Category
+
+	for _, category := range categories {
+		categoryResponse := &pb.Category{
+			Id:          category.ID,
+			Name:        category.Name,
+			Description: category.Description,
+		}
+
+		categoriesResponse = append(categoriesResponse, categoryResponse)
+	}
+
+	return &pb.CategoryList{Categories: categoriesResponse}, nil
+}
+
+func (c *CategoryService) GetCategory(ctx context.Context, in *pb.CategoryGetRequest) (*pb.Category, error) {
+	category, err := c.CategoryDB.Find(in.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	categoryResponse := &pb.Category{
+		Id:          category.ID,
+		Name:        category.Name,
+		Description: category.Description,
+	}
+
+	return categoryResponse, nil
 }

@@ -2,8 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"net"
 
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/paulosarmento/gRPC/internal/database"
 	"github.com/paulosarmento/gRPC/internal/pb"
 	"github.com/paulosarmento/gRPC/internal/service"
@@ -24,7 +26,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	pb.RegisterCategoryServiceServer(grpcServer, categoryService)
 	reflection.Register(grpcServer)
-
+	fmt.Println("Server listening on :50051")
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		panic(err)
